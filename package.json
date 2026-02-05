@@ -2,6 +2,7 @@
   "name": "@zirkelc/typecheck",
   "version": "1.0.0",
   "description": "Typecheck for Monorepos",
+  "packageManager": "pnpm@10.0.0",
   "type": "module",
   "files": [
     "dist"
