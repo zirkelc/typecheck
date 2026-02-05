@@ -16,6 +16,9 @@
     "lint": "biome check . --write",
     "prepare": "husky"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [],
   "author": "Chris Cook",
   "license": "MIT",
