@@ -1,134 +1,43 @@
-# TypeScript Single Package Project Template
+# @zirkelc/typecheck
 
-This template provides an opinionated setup for a single package TypeScript project.
+TypeScript type checker for monorepo packages. Runs `tsc --noEmit` using the TypeScript compiler API and filters out diagnostics from files outside the current package directory.
 
-## 🚀 Features
+This solves the problem of [internal packages](https://turborepo.dev/docs/core-concepts/internal-packages) exporting raw `.ts` files:
 
-- [PNPM](https://pnpm.io/) for efficient package management
-- [Biome](https://biomejs.dev/) for linting and formatting
-- [Vitest](https://vitest.dev/) for fast, modern testing
-- [tsdown](https://github.com/rolldown/tsdown) for TypeScript building and bundling
-- [tsx](https://tsx.is/) for running TypeScript files
-- [Husky](https://github.com/typicode/husky) for Git hooks
-- [GitHub Actions](.github/workflows/ci.yml) for continuous integration
-- [VSCode](.vscode/) debug configuration and editor settings
-- [@total-typescript/tsconfig](https://github.com/total-typescript/tsconfig) for TypeScript configuration
-- [Are The Types Wrong?](https://github.com/arethetypeswrong/arethetypeswrong.github.io) for type validation
-- [publint](https://github.com/publint/publint) for package.json validation
-- [EditorConfig](https://editorconfig.org/) for consistent coding styles
+> Errors in internal dependencies will be reported: When directly exporting TypeScript, type-checking in a dependent package will fail if code in an internal dependency has TypeScript errors. You may find this confusing or problematic in some situations.
 
-## 🚀 Getting Started
-
-### 1. Create a new repository
-
-Create a new repository [using this template](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template)
-
-### 2. Replace placeholders
-
-Replace all occurences of the following placeholders with the correct values:
-
-| Placeholder | File | Description |
-| --- | --- | --- |
-| `<PACKAGE>` | `package.json` | Your package name |
-| `<DESCRIPTION>` | `package.json` | Your package description |
-| `<USERNAME>` | `package.json` | Your GitHub username |
-| `<REPO>` | `package.json` | Your repository name |
-| `<AUTHOR>` | `package.json` | Your name |
-| `<LICENSE>` | `package.json` | Your license |
-
-### 3. Apply ToDos
-
-Find all occurrences of `TODO` and apply them:
-
-| TODO | File | Description |
-| --- | --- | --- |
-| `TODO: PREVIEW` | `.github/workflows/ci.yml` | Create [preview releases](#preview-releases) |
-| `TODO: PUBLISH` | `.github/workflows/ci.yml` | [Publish to NPM](#publish-npm) |
-
-### 4. Install, Build, Test
-
-Verify your project is working by running `install`, `build`, and `test`:
+## Install
 
 ```sh
-pnpm install
-pnpm build
-pnpm test
+pnpm add -D @zirkelc/typecheck
 ```
 
-Happy coding! 🎉
+## Usage
 
-## 📋 Details
+Add a script to your monorepo packages `package.json`:
 
-### Package
+```json
+{
+  "scripts": {
+    "typecheck": "typecheck"
+  }
+}
+```
 
-The [`package.json`](package.json) is configured as ESM (`"type": "module"`), but supports dual publishing with both ESM and CJS module formats.
+Then run in your monorepo packages:
 
-### Biome
+```sh
+# Uses tsconfig.json by default
+pnpm typecheck
 
-[`biome.jsonc`](biome.jsonc) contains the default [Biome configuration](https://biomejs.dev/reference/configuration/) with minimal formatting adjustments. It uses the formatter settings from the [`.editorconfig`](.editorconfig) file.
+# Use a custom tsconfig
+pnpm typecheck --project tsconfig.build.json
+```
 
-### Vitest
+## How it works
 
-An empty Vitest config is provided in [`vitest.config.ts`](vitest.config.ts).
-
-### Build and Run
-
-- `tsdown` builds `./src/index.ts`, outputting an ES module to the `dist` folder.
-- `tsx` compiles and runs TypeScript files on-the-fly.
-
-### Git Hooks
-
-[Husky](https://github.com/typicode/husky) runs the [.husky/pre-commit](.husky/pre-commit) hook to lint staged files.
-
-### Continuous Integration
-
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) defines a GitHub Actions workflow to run linting and tests on commits and pull requests.
-
-### VSCode Integration
-
-#### Debugging
-
-[`.vscode/launch.json`](.vscode/launch.json) provides VSCode launch configurations:
-- `Debug (tsx)`: Run and debug TypeScript files
-- `Test (vitest)`: Debug tests
-
-It uses the [JavaScript Debug Terminal](https://code.visualstudio.com/docs/nodejs/nodejs-debugging) to run and debug.
-
-#### Editor Settings
-
-[`.vscode/settings.json`](.vscode/settings.json) configures Biome as the formatter and enables format-on-save.
-
-### EditorConfig
-
-[`.editorconfig`](.editorconfig) ensures consistent coding styles across different editors and IDEs:
-
-- Uses spaces for indentation (2 spaces)
-- Sets UTF-8 charset
-- Ensures LF line endings
-- Trims trailing whitespace (except in Markdown files)
-- Inserts a final newline in files
-
-This configuration complements Biome and helps maintain a consistent code style throughout the project.
-
-### Types Validation
-
-The project includes the `@arethetypeswrong/cli` CLI tool to validate TypeScript types in your package. It is integrated into `tsdown` and will run automatically during the build
-
-### Publint
-
-The project includes `publint` to validate your `package.json` file. It is integrated into `tsdown` and will run automatically during the build.
-
-## Optional
-
-### <a name="publish-npm"></a> Publish to NPM
-[JS-DevTools/npm-publish](https://github.com/JS-DevTools/npm-publish) is a GitHub Action to publish packages to npm automatically by updating the version number.
-
-To enable this, apply the `TODO: PUBLISH`.
-
-### <a name="preview-releases"></a> Preview Releases
-
-[pkg.pr.new](https://github.com/stackblitz-labs/pkg.pr.new) will automatically generate preview releases for every push and pull request. This allows you to test changes before publishing to npm.
-
-Must install GitHub App: [pkg.pr.new](https://github.com/apps/pkg-pr-new)
-
-To enable this, apply the `TODO: PREVIEW`.
+1. Reads the `tsconfig.json` (or `--project` target) in `process.cwd()`
+2. Creates a `ts.Program` and collects all diagnostics via `ts.getPreEmitDiagnostics()`
+3. Filters diagnostics: only keeps errors where the source file is inside the current directory
+4. Formats remaining errors with colors and code context using `ts.formatDiagnosticsWithColorAndContext()`
+5. Exits with code 1 if local errors exist, 0 otherwise
