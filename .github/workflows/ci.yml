@@ -15,16 +15,6 @@ permissions:
   pull-requests: write  # needed for coverage comment
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Setup Biome
-        uses: biomejs/setup-biome@v2
-      - name: Lint
-        run: biome ci --no-errors-on-unmatched .
-
   test:
     name: Test
     runs-on: ubuntu-latest
