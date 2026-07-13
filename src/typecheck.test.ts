@@ -5,9 +5,13 @@ import { describe, expect, test } from "vitest";
 const cliPath = path.resolve(import.meta.dirname, `../dist/typecheck.mjs`);
 const fixturesPath = path.resolve(import.meta.dirname, `../test/fixtures`);
 
+/**
+ * GITHUB_ACTIONS is cleared so that the tests behave the same whether or not they
+ * themselves run on CI. Tests that exercise the annotation output opt back in.
+ */
 const execOptions: ExecSyncOptionsWithStringEncoding = {
   encoding: `utf-8`,
-  env: { ...process.env, FORCE_COLOR: `0` },
+  env: { ...process.env, FORCE_COLOR: `0`, GITHUB_ACTIONS: `` },
 };
 
 function runTypecheck(
