@@ -10,10 +10,15 @@ const execOptions: ExecSyncOptionsWithStringEncoding = {
   env: { ...process.env, FORCE_COLOR: `0` },
 };
 
-function runTypecheck(cwd: string, args: Array<string> = []): { stdout: string; exitCode: number } {
+function runTypecheck(
+  cwd: string,
+  args: Array<string> = [],
+  env: NodeJS.ProcessEnv = {},
+): { stdout: string; exitCode: number } {
   try {
     const stdout = execSync([`node`, cliPath, ...args].join(` `), {
       ...execOptions,
+      env: { ...execOptions.env, ...env },
       cwd,
     });
     return { stdout, exitCode: 0 };
@@ -70,5 +75,46 @@ describe(`typecheck`, () => {
     // Assert
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain(`1 external error(s) filtered`);
+  });
+
+  test(`should print a code frame with the error location`, () => {
+    // Arrange
+    const cwd = path.join(fixturesPath, `errors`);
+
+    // Act
+    const result = runTypecheck(cwd);
+
+    // Assert
+    expect(result.stdout).toContain(
+      `index.ts:1:7 - error TS2322: Type 'number' is not assignable to type 'string'.`,
+    );
+    expect(result.stdout).toContain(`1 const message: string = 123;`);
+    expect(result.stdout).toContain(`~~~~~~~`);
+  });
+
+  test(`should emit GitHub Actions annotations on CI`, () => {
+    // Arrange
+    const cwd = path.join(fixturesPath, `errors`);
+
+    // Act
+    const result = runTypecheck(cwd, [], { GITHUB_ACTIONS: `true` });
+
+    // Assert
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toContain(
+      `::error file=index.ts,line=1,col=7::TS2322: Type 'number' is not assignable to type 'string'.`,
+    );
+  });
+
+  test(`should not emit GitHub Actions annotations outside CI`, () => {
+    // Arrange
+    const cwd = path.join(fixturesPath, `errors`);
+
+    // Act
+    const result = runTypecheck(cwd);
+
+    // Assert
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).not.toContain(`::error`);
   });
 });

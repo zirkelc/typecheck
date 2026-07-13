@@ -1,4 +1,4 @@
-import { defineConfig } from 'tsdown';
+import { defineConfig } from "tsdown";
 
 export default defineConfig({
   /**
@@ -7,6 +7,6 @@ export default defineConfig({
    */
   publint: true,
   exports: true,
-  entry: 'src/typecheck.ts',
-  format: ['esm'],
+  entry: "src/typecheck.ts",
+  format: ["esm"],
 });

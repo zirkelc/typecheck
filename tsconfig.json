@@ -1,6 +1,9 @@
 {
   // https://github.com/total-typescript/tsconfig
   "extends": "@total-typescript/tsconfig/tsc/no-dom/library",
-  "compilerOptions": {},
+  "compilerOptions": {
+    // TypeScript 7 no longer pulls in node_modules/@types automatically.
+    "types": ["node"]
+  },
   "include": ["src"]
 }

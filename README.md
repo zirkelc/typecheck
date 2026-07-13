@@ -37,7 +37,13 @@ pnpm typecheck --project tsconfig.build.json
 ## How it works
 
 1. Reads the `tsconfig.json` (or `--project` target) in `process.cwd()`
-2. Creates a `ts.Program` and collects all diagnostics via `ts.getPreEmitDiagnostics()`
+2. Opens the project through the TypeScript API and collects the diagnostics that `tsc --noEmit` would report
 3. Filters diagnostics: only keeps errors where the source file is inside the current directory
-4. Formats remaining errors with colors and code context using `ts.formatDiagnosticsWithColorAndContext()`
+4. Formats remaining errors with colors and a code frame
 5. Exits with code 1 if local errors exist, 0 otherwise
+
+## Requirements
+
+TypeScript 7 (peer dependency). The native compiler is driven through its
+`typescript/unstable/*` API, which is not yet covered by TypeScript's stability
+guarantees, so a minor TypeScript release may require an update here.

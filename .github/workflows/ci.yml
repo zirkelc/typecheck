@@ -9,10 +9,10 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  checks: write         # needed for checks
-  id-token: write       # needed for npm publish with provenance
-  contents: write       # needed for github release
-  pull-requests: write  # needed for coverage comment
+  checks: write # needed for checks
+  id-token: write # needed for npm publish with provenance
+  contents: write # needed for github release
+  pull-requests: write # needed for coverage comment
 
 jobs:
   test:
@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org/
-          cache: 'pnpm'
+          cache: "pnpm"
       - name: Install
         run: pnpm install
       - name: Build

@@ -1,60 +1,60 @@
 {
   "name": "@zirkelc/typecheck",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Typecheck for Monorepos",
-  "packageManager": "pnpm@10.0.0",
-  "type": "module",
+  "keywords": [],
+  "license": "MIT",
+  "author": "Chris Cook",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zirkelc/typecheck"
+  },
+  "bin": {
+    "typecheck": "./dist/typecheck.mjs"
+  },
   "files": [
     "dist"
   ],
-  "bin": {
-    "typecheck": "./dist/typecheck.mjs"
+  "type": "module",
+  "exports": {
+    ".": "./dist/typecheck.mjs",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "prepublishOnly": "pnpm build",
     "build": "tsdown",
+    "typecheck": "tsc --noEmit",
     "test": "vitest",
     "lint": "oxlint --fix",
     "format": "oxfmt",
     "prepare": "husky"
   },
-  "publishConfig": {
-    "access": "public"
-  },
-  "keywords": [],
-  "author": "Chris Cook",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/zirkelc/typecheck"
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@total-typescript/tsconfig": "^1.0.4",
+    "@types/node": "^26.1.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
+    "oxfmt": "^0.58.0",
+    "oxlint": "^1.73.0",
+    "pkg-pr-new": "^0.0.75",
+    "publint": "^0.3.21",
+    "tsdown": "^0.22.7",
+    "tsx": "^4.23.1",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
   },
   "peerDependencies": {
-    "typescript": "^5.9.3"
-  },
-  "devDependencies": {
-    "@arethetypeswrong/cli": "^0.18.2",
-    "@biomejs/biome": "^2.3.14",
-    "@total-typescript/tsconfig": "^1.0.4",
-    "@types/node": "^25.2.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^16.2.7",
-    "oxfmt": "^0.28.0",
-    "oxlint": "^1.43.0",
-    "pkg-pr-new": "^0.0.63",
-    "publint": "^0.3.17",
-    "tsdown": "^0.20.3",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.18"
-  },
-  "exports": {
-    ".": "./dist/typecheck.mjs",
-    "./package.json": "./package.json"
+    "typescript": "^7.0.2"
   },
   "lint-staged": {
     "*.{js,ts,mjs,mts}": [
       "oxlint --fix",
       "oxfmt"
     ]
-  }
+  },
+  "packageManager": "pnpm@10.0.0"
 }
